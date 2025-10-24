@@ -16,11 +16,11 @@ code {
     monospace;
 }
 
-/* 메가 메뉴 애니메이션 */
-@keyframes megamenu {
+/* 드롭다운 애니메이션 */
+@keyframes dropdown {
   from {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-10px);
   }
   to {
     opacity: 1;
@@ -28,8 +28,8 @@ code {
   }
 }
 
-.animate-megamenu {
-  animation: megamenu 0.3s ease-out;
+.animate-dropdown {
+  animation: dropdown 0.2s ease-out;
 }
 
 /* 오버레이 애니메이션 */

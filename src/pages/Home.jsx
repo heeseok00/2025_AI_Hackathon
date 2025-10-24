@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Navigation from '../components/Navigation.jsx';
 import WorldMap from '../components/WorldMap.jsx';
 import NewsCard from '../components/NewsCard.jsx';
@@ -8,6 +8,7 @@ export default function Home() {
 	const [country, setCountry] = useState('US');
 	const [articles, setArticles] = useState([]);
 	const [loading, setLoading] = useState(false);
+	const newsRef = useRef(null);
 
 	useEffect(() => {
 		(async () => {
@@ -15,6 +16,16 @@ export default function Home() {
 			const results = await fetchNews({ countryCode: country });
 			setArticles(results);
 			setLoading(false);
+
+			// 국가 선택 시 뉴스 섹션으로 부드럽게 스크롤
+			if (newsRef.current) {
+				setTimeout(() => {
+					newsRef.current.scrollIntoView({ 
+						behavior: 'smooth', 
+						block: 'start' 
+					});
+				}, 100);
+			}
 		})();
 	}, [country]);
 
@@ -45,8 +56,8 @@ export default function Home() {
 					<WorldMap selectedCountry={country} onCountrySelect={setCountry} />
 				</section>
 
-				{/* 뉴스 섹션 */}
-				<section>
+				{/* 뉴스 섹션 - ref 추가 */}
+				<section ref={newsRef} className="scroll-mt-20">
 					<div className="flex items-center justify-between mb-6">
 						<h2 className="text-2xl font-bold text-gray-800">
 							📰 {country} 주요 뉴스

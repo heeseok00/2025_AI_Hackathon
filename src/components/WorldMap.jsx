@@ -68,8 +68,28 @@ export default function WorldMap({ selectedCountry, onCountrySelect }) {
 			<div className="mb-4">
 				<h2 className="text-2xl font-bold text-gray-800">🌍 국가를 선택하세요</h2>
 				<p className="text-sm text-gray-600 mt-1">
-					지도에서 국가를 클릭하면 해당 국가의 뉴스를 볼 수 있습니다
+					국가를 클릭하면 해당 국가의 뉴스로 자동 이동합니다
 				</p>
+			</div>
+
+			{/* 국가 선택 버튼 */}
+			<div className="mb-4 p-3 bg-blue-50 rounded-lg">
+				<p className="text-xs text-gray-600 mb-2 font-semibold">📍 빠른 선택:</p>
+				<div className="flex flex-wrap gap-2">
+					{Object.entries(COUNTRY_CODE_MAP).map(([id, code]) => (
+						<button
+							key={id}
+							onClick={() => onCountrySelect(code)}
+							className={`px-3 py-1 text-xs font-medium rounded-full transition-all ${
+								selectedCountry === code
+									? 'bg-blue-700 text-white shadow-md'
+									: 'bg-white text-gray-700 hover:bg-blue-100 border border-gray-200'
+							}`}
+						>
+							{code}
+						</button>
+					))}
+				</div>
 			</div>
 
 			<div className="relative bg-white rounded-lg shadow-inner p-2">
@@ -132,49 +152,6 @@ export default function WorldMap({ selectedCountry, onCountrySelect }) {
 						{COUNTRY_CODE_MAP[hoveredCountry]}
 					</div>
 				)}
-			</div>
-
-			{/* 색상 범례 */}
-			<div className="mt-4 p-3 bg-white rounded-lg border border-gray-200">
-				<p className="text-xs text-gray-600 mb-3 font-semibold">🎨 색상 범례:</p>
-				<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-					<div className="flex items-center gap-2">
-						<div className="w-6 h-6 rounded border border-gray-300" style={{ backgroundColor: COLORS.UNSELECTABLE }}></div>
-						<span className="text-xs text-gray-600">선택 불가</span>
-					</div>
-					<div className="flex items-center gap-2">
-						<div className="w-6 h-6 rounded border border-gray-300" style={{ backgroundColor: COLORS.SELECTABLE }}></div>
-						<span className="text-xs text-gray-600">선택 가능</span>
-					</div>
-					<div className="flex items-center gap-2">
-						<div className="w-6 h-6 rounded border border-gray-300" style={{ backgroundColor: COLORS.HOVERED }}></div>
-						<span className="text-xs text-gray-600">마우스 올림</span>
-					</div>
-					<div className="flex items-center gap-2">
-						<div className="w-6 h-6 rounded border border-gray-300" style={{ backgroundColor: COLORS.SELECTED }}></div>
-						<span className="text-xs text-gray-600 font-semibold">선택됨</span>
-					</div>
-				</div>
-			</div>
-
-			{/* 선택 가능한 국가 목록 */}
-			<div className="mt-4 p-3 bg-blue-50 rounded-lg">
-				<p className="text-xs text-gray-600 mb-2 font-semibold">📍 선택 가능한 국가:</p>
-				<div className="flex flex-wrap gap-2">
-					{Object.entries(COUNTRY_CODE_MAP).map(([id, code]) => (
-						<button
-							key={id}
-							onClick={() => onCountrySelect(code)}
-							className={`px-3 py-1 text-xs font-medium rounded-full transition-all ${
-								selectedCountry === code
-									? 'bg-blue-700 text-white shadow-md'
-									: 'bg-white text-gray-700 hover:bg-blue-100 border border-gray-200'
-							}`}
-						>
-							{code}
-						</button>
-					))}
-				</div>
 			</div>
 		</div>
 	);
