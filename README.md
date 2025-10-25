@@ -32,7 +32,9 @@ hackaton/
 │   │   └── translateAPI.js    # 번역 API 연동 (한국어 번역)
 │   │
 │   ├── 📁 components/          # 재사용 가능한 UI 컴포넌트
+│   │   ├── Navigation.jsx     # 네비게이션 바
 │   │   ├── NewsCard.jsx       # 뉴스 카드 UI
+│   │   ├── WorldMap.jsx       # 인터랙티브 세계 지도
 │   │   ├── CountrySelector.jsx # 국가 선택 드롭다운
 │   │   └── TrendMap.jsx       # 트렌드 지도 시각화
 │   │
@@ -116,15 +118,28 @@ hackaton/
 ### 📁 components/
 **목적**: 재사용 가능한 독립적인 UI 컴포넌트
 
+#### `Navigation.jsx`
+- **역할**: 빅카인즈 스타일 네비게이션 바
+- **특징**: 드롭다운 메뉴, 로그인/회원가입 버튼
+- **하위 메뉴**: 뉴스분석, 빅카인즈 AI, 뉴스보기 등
+
+#### `WorldMap.jsx`
+- **역할**: 인터랙티브 세계 지도
+- **특징**: 
+  - react-simple-maps 사용
+  - 국가 클릭으로 선택
+  - 4가지 색상으로 상태 표시
+  - 자동 스크롤 기능
+
 #### `NewsCard.jsx`
 - **역할**: 개별 뉴스 기사를 카드 형태로 표시
 - **Props**: `title`, `description`, `source`, `url`
 - **특징**: 제목, 설명, 출처, 링크를 시각적으로 정리
 
 #### `CountrySelector.jsx`
-- **역할**: 국가 선택 UI (드롭다운 → 지도 클릭으로 변경 예정)
+- **역할**: 국가 선택 UI
 - **Props**: `value`, `onChange`, `countries`
-- **기본 국가**: 미국, 한국, 일본, 영국, 독일
+- **기본 국가**: 미국, 한국, 일본, 영국, 독일 등 15개국
 
 #### `TrendMap.jsx`
 - **역할**: 국가별 트렌드를 지도 기반으로 시각화
@@ -141,8 +156,8 @@ hackaton/
   - `articles`: 뉴스 기사 배열
 - **동작**:
   1. 국가 선택 시 `fetchNews()` 호출
-  2. 뉴스 데이터를 `NewsCard`로 렌더링
-  3. `TrendMap`에 데이터 전달
+  2. 자동 스크롤로 뉴스 섹션 이동
+  3. 뉴스 데이터를 `NewsCard`로 렌더링
 
 ---
 
@@ -192,6 +207,7 @@ VITE_OPENAI_API_KEY=your_key_here
 | **빌드 도구** | Vite 5 | 초고속 개발 서버 & 빌드 |
 | **스타일링** | TailwindCSS 3 | 유틸리티 기반 CSS 프레임워크 |
 | **HTTP 클라이언트** | Axios | API 요청 관리 |
+| **지도 라이브러리** | react-simple-maps | 인터랙티브 세계 지도 |
 | **패키지 관리** | npm | 의존성 설치 및 관리 |
 
 ---
@@ -254,6 +270,7 @@ lsof -ti:5173 | xargs kill -9
 - [Vite 공식 문서](https://vitejs.dev/)
 - [React 공식 문서](https://react.dev/)
 - [TailwindCSS 공식 문서](https://tailwindcss.com/)
+- [react-simple-maps](https://www.react-simple-maps.io/)
 - [News API 문서](https://newsapi.org/docs)
 
 ---
