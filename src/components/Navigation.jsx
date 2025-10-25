@@ -57,7 +57,10 @@ export default function Navigation() {
 
 	return (
 		<>
-			<nav className="bg-white border-b border-gray-200 shadow-sm relative z-50">
+			<nav 
+				className="bg-white border-b border-gray-200 shadow-sm relative z-50"
+				onMouseLeave={() => setOpenDropdown(null)}
+			>
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					{/* 상단 네비게이션 */}
 					<div className="flex items-center justify-between h-16">
@@ -75,7 +78,6 @@ export default function Navigation() {
 									key={item.id}
 									className="relative"
 									onMouseEnter={() => setOpenDropdown(item.id)}
-									onMouseLeave={() => setOpenDropdown(null)}
 								>
 									<button
 										className={`px-6 py-5 text-base font-semibold transition-colors relative ${
@@ -90,25 +92,6 @@ export default function Navigation() {
 											<div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600"></div>
 										)}
 									</button>
-
-									{/* 각 항목 바로 아래 드롭다운 */}
-									{openDropdown === item.id && (
-										<div 
-											className="absolute left-0 top-full mt-0 w-64 bg-white border border-gray-200 shadow-xl rounded-b-md animate-dropdown z-50"
-										>
-											<div className="py-2">
-												{item.subItems.map((subItem) => (
-													<a
-														key={subItem.id}
-														href={subItem.link}
-														className="block px-5 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-													>
-														{subItem.title}
-													</a>
-												))}
-											</div>
-										</div>
-									)}
 								</div>
 							))}
 						</div>
@@ -133,6 +116,45 @@ export default function Navigation() {
 						</div>
 					</div>
 				</div>
+
+				{/* 통합 드롭다운 영역 - 각 메뉴 아래에 일렬로 배치 */}
+				{openDropdown && (
+					<div className="absolute left-0 right-0 top-full bg-white border-t border-gray-200 shadow-2xl animate-slideDown z-40">
+						<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+							<div className="flex justify-center gap-1 py-6">
+								{/* 각 메뉴를 상단 버튼과 같은 위치에 배치 */}
+								{NAV_ITEMS.map((menuItem) => (
+									<div key={menuItem.id} className="px-6" style={{ minWidth: '200px' }}>
+										<div className="space-y-2">
+											<h3 className={`text-sm font-bold pb-2 mb-2 border-b-2 transition-all duration-300 ${
+												openDropdown === menuItem.id 
+													? 'text-blue-600 border-blue-600' 
+													: 'text-gray-400 border-transparent'
+											}`}>
+												{menuItem.title}
+											</h3>
+											<div className="space-y-1">
+												{menuItem.subItems.map((subItem) => (
+													<a
+														key={subItem.id}
+														href={subItem.link}
+														className={`block px-3 py-2.5 text-sm rounded-md transition-all duration-200 ${
+															openDropdown === menuItem.id
+																? 'text-gray-700 hover:bg-blue-50 hover:text-blue-600 hover:translate-x-1'
+																: 'text-gray-300 pointer-events-none'
+														}`}
+													>
+														{subItem.title}
+													</a>
+												))}
+											</div>
+										</div>
+									</div>
+								))}
+							</div>
+						</div>
+					</div>
+				)}
 			</nav>
 
 			{/* 어두운 배경 오버레이 */}
@@ -140,7 +162,7 @@ export default function Navigation() {
 				<div 
 					className="fixed inset-0 bg-black/20 animate-overlay z-30"
 					style={{ top: '64px' }}
-					onClick={() => setOpenDropdown(null)}
+					onMouseEnter={() => setOpenDropdown(null)}
 				/>
 			)}
 		</>
