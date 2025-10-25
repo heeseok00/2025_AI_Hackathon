@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Navigation from '../components/Navigation.jsx';
 import WorldMap from '../components/WorldMap.jsx';
+import CountryWindow from '../components/CountryWindow.jsx';
 import NewsCard from '../components/NewsCard.jsx';
 import { fetchNews } from '../api/newsAPI.js';
 
@@ -8,6 +9,9 @@ export default function Home() {
 	const [country, setCountry] = useState(null);
 	const [articles, setArticles] = useState([]);
 	const [loading, setLoading] = useState(false);
+	const newsRef = useRef(null);
+	const hasMountedRef = useRef(false);
+	const [isCountryWindowOpen, setIsCountryWindowOpen] = useState(false);
 
 	useEffect(() => {
 		if (!country) return;
@@ -17,6 +21,24 @@ export default function Home() {
 			const results = await fetchNews({ countryCode: country });
 			setArticles(results);
 			setLoading(false);
+
+			// 국가 선택 시 뉴스 섹션으로 부드럽게 스크롤
+			if (newsRef.current) {
+				setTimeout(() => {
+					newsRef.current.scrollIntoView({
+						behavior: 'smooth',
+						block: 'center',
+						inline: 'nearest'
+					});
+				}, 120);
+			}
+
+			// 초기 렌더링 이후 국가 변경 시 빈 직사각형 페이지 표시
+			if (hasMountedRef.current) {
+				setIsCountryWindowOpen(true);
+			} else {
+				hasMountedRef.current = true;
+			}
 		})();
 	}, [country]);
 
@@ -65,7 +87,7 @@ export default function Home() {
 				</section>
 
 				{/* 뉴스 섹션 */}
-				<section className="scroll-mt-20">
+				<section className="scroll-mt-20" ref={newsRef}>
 					<div className="flex items-center justify-between mb-6">
 						<h2 className="text-2xl font-bold text-gray-800">
 							📰 {country ? `${country} 주요 뉴스` : '글로벌 뉴스'}
@@ -81,6 +103,10 @@ export default function Home() {
 						)}
 					</div>
 
+					{/* CountryWindow 컴포넌트 */}
+					<CountryWindow open={isCountryWindowOpen} countryCode={country} topArticles={articles} />
+
+					{/* 기존 뉴스 카드 그리드 */}
 					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 						{!country ? (
 							<div className="col-span-full text-center py-12">
