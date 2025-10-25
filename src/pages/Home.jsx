@@ -2,11 +2,12 @@ import React, { useEffect, useState, useRef } from 'react';
 import Navigation from '../components/Navigation.jsx';
 import WorldMap from '../components/WorldMap.jsx';
 import CountryWindow from '../components/CountryWindow.jsx';
-import NewsCard from '../components/NewsCard.jsx';
+import CategorySelector from '../components/CategorySelector.jsx';
 import { fetchNews } from '../api/newsAPI.js';
 
 export default function Home() {
 	const [country, setCountry] = useState(null);
+	const [category, setCategory] = useState(null);
 	const [articles, setArticles] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const newsRef = useRef(null);
@@ -18,7 +19,9 @@ export default function Home() {
 
 		(async () => {
 			setLoading(true);
-			const results = await fetchNews({ countryCode: country });
+			console.log('Fetching news for country:', country, 'category:', category);
+			const results = await fetchNews({ countryCode: country, category: category });
+			console.log('News API results:', results);
 			setArticles(results);
 			setLoading(false);
 
@@ -33,14 +36,11 @@ export default function Home() {
 				}, 120);
 			}
 
-			// 초기 렌더링 이후 국가 변경 시 빈 직사각형 페이지 표시
-			if (hasMountedRef.current) {
-				setIsCountryWindowOpen(true);
-			} else {
-				hasMountedRef.current = true;
-			}
+			// 국가 선택 시 CountryWindow 열기
+			setIsCountryWindowOpen(true);
+			hasMountedRef.current = true;
 		})();
-	}, [country]);
+	}, [country, category]);
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -61,7 +61,12 @@ export default function Home() {
 								<span className="text-lg font-bold text-blue-600">{country}</span>
 							</div>
 							<button
-								onClick={() => setCountry(null)}
+								onClick={() => {
+									setCountry(null);
+									setCategory(null);
+									setIsCountryWindowOpen(false);
+									setArticles([]);
+								}}
 								className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all duration-200"
 								title="초기화"
 							>
@@ -104,34 +109,22 @@ export default function Home() {
 					</div>
 
 					{/* CountryWindow 컴포넌트 */}
-					<CountryWindow open={isCountryWindowOpen} countryCode={country} topArticles={articles} />
+					<CountryWindow 
+						open={isCountryWindowOpen} 
+						countryCode={country} 
+						topArticles={articles}
+						selectedCategory={category}
+						onCategoryChange={setCategory}
+					/>
 
-					{/* 기존 뉴스 카드 그리드 */}
-					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-						{!country ? (
-							<div className="col-span-full text-center py-12">
-								<div className="text-6xl mb-4">🗺️</div>
-								<p className="text-gray-600 text-lg font-semibold">국가를 선택해주세요</p>
-								<p className="text-gray-500 text-sm mt-2">지도에서 국가를 클릭하거나 드롭다운에서 검색하세요.</p>
-							</div>
-						) : articles.length === 0 && !loading ? (
-							<div className="col-span-full text-center py-12">
-								<div className="text-6xl mb-4">📭</div>
-								<p className="text-gray-600 text-lg">아직 뉴스가 없습니다.</p>
-								<p className="text-gray-500 text-sm mt-2">API를 연동하면 뉴스가 표시됩니다.</p>
-							</div>
-						) : (
-							articles.map((article, idx) => (
-								<NewsCard
-									key={idx}
-									title={article.title}
-									description={article.description}
-									source={article.source}
-									url={article.url}
-								/>
-							))
-						)}
-					</div>
+					{/* 국가 선택 안내 메시지 */}
+					{!country && (
+						<div className="text-center py-12">
+							<div className="text-6xl mb-4">🗺️</div>
+							<p className="text-gray-600 text-lg font-semibold">국가를 선택해주세요</p>
+							<p className="text-gray-500 text-sm mt-2">지도에서 국가를 클릭하거나 드롭다운에서 검색하세요.</p>
+						</div>
+					)}
 				</section>
 			</main>
 
