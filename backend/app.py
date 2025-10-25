@@ -4,6 +4,8 @@ import os
 import json
 from dotenv import load_dotenv
 from processor import NewsProcessingService
+from sentiment_analyzer import get_sentiment_analyzer
+from chatbot import get_chatbot
 import traceback
 
 # 환경변수 로드
@@ -14,6 +16,8 @@ CORS(app)  # CORS 허용
 
 # 서비스 초기화
 news_service = NewsProcessingService()
+sentiment_analyzer = get_sentiment_analyzer()
+chatbot = get_chatbot()
 
 @app.route('/api/scrape', methods=['POST'])
 def scrape_article():
@@ -137,6 +141,75 @@ def process_full_article():
             'error': f'서버 오류: {str(e)}'
         }), 500
 
+@app.route('/api/sentiment', methods=['POST'])
+def analyze_sentiment():
+    """뉴스 감성 분석 API (호재/악재 판단)"""
+    try:
+        data = request.get_json()
+        title = data.get('title', '')
+        description = data.get('description', '')
+        
+        if not title:
+            return jsonify({
+                'success': False,
+                'error': '제목이 필요합니다'
+            }), 400
+        
+        # 감성 분석 수행
+        result = sentiment_analyzer.analyze_news(title, description)
+        
+        if result:
+            return jsonify({
+                'success': True,
+                'sentiment': result
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': '감성 분석에 실패했습니다'
+            }), 500
+            
+    except Exception as e:
+        print(f"감성 분석 오류: {e}")
+        print(traceback.format_exc())
+        return jsonify({
+            'success': False,
+            'error': f'서버 오류: {str(e)}'
+        }), 500
+
+@app.route('/api/chat', methods=['POST'])
+def chat():
+    """AI 챗봇 API"""
+    try:
+        data = request.get_json()
+        message = data.get('message', '')
+        conversation_history = data.get('history', [])
+        
+        if not message or len(message.strip()) == 0:
+            return jsonify({
+                'success': False,
+                'error': '메시지를 입력해주세요'
+            }), 400
+        
+        # 챗봇 응답 생성
+        result = chatbot.chat(message, conversation_history)
+        
+        if result['success']:
+            return jsonify(result)
+        else:
+            return jsonify({
+                'success': False,
+                'error': '챗봇 응답 생성에 실패했습니다'
+            }), 500
+            
+    except Exception as e:
+        print(f"챗봇 API 오류: {e}")
+        print(traceback.format_exc())
+        return jsonify({
+            'success': False,
+            'error': f'서버 오류: {str(e)}'
+        }), 500
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """서버 상태 확인"""
@@ -155,6 +228,8 @@ def index():
             'POST /api/translate': '텍스트 번역',
             'POST /api/summarize': '텍스트 요약',
             'POST /api/process': '전체 기사 처리',
+            'POST /api/sentiment': '뉴스 감성 분석 (호재/악재)',
+            'POST /api/chat': 'AI 챗봇 대화',
             'GET /api/health': '서버 상태 확인'
         },
         'example': {

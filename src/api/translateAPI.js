@@ -2,6 +2,58 @@
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
+// 키워드 번역 함수
+export async function translateKeywords(keywords) {
+	if (!keywords || keywords.length === 0) return [];
+	
+	// OpenAI API 키가 없으면 원본 키워드 반환
+	if (!OPENAI_API_KEY) {
+		console.warn('OpenAI API 키가 설정되지 않았습니다. 원본 키워드를 사용합니다.');
+		return keywords;
+	}
+
+	try {
+		const keywordText = keywords.map(k => k.word).join(', ');
+		const prompt = `다음 키워드들을 한국어로 번역해주세요. 각 키워드는 쉼표로 구분해서 반환해주세요: ${keywordText}`;
+		
+		const response = await fetch(OPENAI_API_URL, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${OPENAI_API_KEY}`
+			},
+			body: JSON.stringify({
+				model: 'gpt-3.5-turbo',
+				messages: [
+					{
+						role: 'user',
+						content: prompt
+					}
+				],
+				max_tokens: 500,
+				temperature: 0.3
+			})
+		});
+
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+
+		const data = await response.json();
+		const translatedText = data.choices[0].message.content.trim();
+		const translatedKeywords = translatedText.split(',').map(k => k.trim());
+		
+		// 원본 키워드와 번역된 키워드를 매핑
+		return keywords.map((keyword, index) => ({
+			...keyword,
+			translatedWord: translatedKeywords[index] || keyword.word
+		}));
+	} catch (error) {
+		console.error('키워드 번역 오류:', error);
+		return keywords; // 오류 시 원본 반환
+	}
+}
+
 // GPT API를 사용한 번역 함수
 export async function translateText(text, targetLanguage = 'ko') {
 	if (!text || text.trim() === '') return text;

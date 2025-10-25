@@ -86,6 +86,32 @@ export async function summarizeText(text, maxLength = 300) {
 	}
 }
 
+// 뉴스 감성 분석 (호재/악재)
+export async function analyzeSentiment(title, description = '') {
+	try {
+		const response = await fetch(`${BACKEND_URL}/api/sentiment`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ title, description })
+		});
+		
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+		
+		const data = await response.json();
+		return data;
+	} catch (error) {
+		console.error('감성 분석 오류:', error);
+		return {
+			success: false,
+			error: error.message
+		};
+	}
+}
+
 // 서버 상태 확인
 export async function checkServerHealth() {
 	try {

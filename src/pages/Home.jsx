@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Navigation from '../components/Navigation.jsx';
+import Sidebar from '../components/Sidebar.jsx';
 import WorldMap from '../components/WorldMap.jsx';
 import CountryWindow from '../components/CountryWindow.jsx';
 import CategorySelector from '../components/CategorySelector.jsx';
@@ -10,6 +11,7 @@ export default function Home() {
 	const [category, setCategory] = useState(null);
 	const [articles, setArticles] = useState([]);
 	const [loading, setLoading] = useState(false);
+	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 	const newsRef = useRef(null);
 	const hasMountedRef = useRef(false);
 	const [isCountryWindowOpen, setIsCountryWindowOpen] = useState(false);
@@ -19,9 +21,7 @@ export default function Home() {
 
 		(async () => {
 			setLoading(true);
-			console.log('Fetching news for country:', country, 'category:', category);
 			const results = await fetchNews({ countryCode: country, category: category });
-			console.log('News API results:', results);
 			setArticles(results);
 			setLoading(false);
 
@@ -45,7 +45,13 @@ export default function Home() {
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
 			{/* 네비게이션 바 */}
-			<Navigation />
+			<Navigation onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+
+			{/* 사이드바 */}
+			<Sidebar 
+				isOpen={isSidebarOpen} 
+				onClose={() => setIsSidebarOpen(false)} 
+			/>
 
 			{/* 서브 헤더 */}
 			<header className="bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-40">
@@ -115,6 +121,7 @@ export default function Home() {
 						topArticles={articles}
 						selectedCategory={category}
 						onCategoryChange={setCategory}
+						loading={loading}
 					/>
 
 					{/* 국가 선택 안내 메시지 */}

@@ -13,7 +13,7 @@ const NAV_ITEMS = [
 	},
 	{
 		id: 2,
-		title: '빅카인즈 AI',
+		title: 'GlobaLink AI',
 		subItems: [
 			{ id: 21, title: 'AI 뉴스 분석', link: '#' },
 			{ id: 22, title: 'AI 트렌드 예측', link: '#' },
@@ -30,7 +30,7 @@ const NAV_ITEMS = [
 	},
 	{
 		id: 4,
-		title: '빅카인즈 활용',
+		title: 'GlobaLink 활용',
 		subItems: [
 			{ id: 41, title: '미디어 스타트업', link: '#' },
 			{ id: 42, title: '활용사례', link: '#' },
@@ -42,9 +42,9 @@ const NAV_ITEMS = [
 	},
 	{
 		id: 5,
-		title: '빅카인즈 소개',
+		title: 'GlobaLink 소개',
 		subItems: [
-			{ id: 51, title: '빅카인즈 소개', link: '#' },
+			{ id: 51, title: 'GlobaLink 소개', link: '#' },
 			{ id: 52, title: '서비스 안내', link: '#' },
 			{ id: 53, title: '수집기사 정보', link: '#' },
 			{ id: 54, title: '이용안내', link: '#' },
@@ -52,7 +52,7 @@ const NAV_ITEMS = [
 	},
 ];
 
-export default function Navigation() {
+export default function Navigation({ onToggleSidebar }) {
 	const [openDropdown, setOpenDropdown] = useState(null);
 
 	return (
@@ -64,11 +64,25 @@ export default function Navigation() {
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					{/* 상단 네비게이션 */}
 					<div className="flex items-center justify-between h-16">
-						{/* 로고 */}
-						<div className="flex-shrink-0">
-							<h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-								GlobaLink
-							</h1>
+						{/* 왼쪽: 햄버거 메뉴와 로고 */}
+						<div className="flex items-center space-x-4">
+							{/* 햄버거 메뉴 아이콘 */}
+							<button 
+								onClick={onToggleSidebar}
+								className="p-2 rounded-md text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300"
+								title="메뉴 열기"
+							>
+								<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+								</svg>
+							</button>
+							
+							{/* 로고 */}
+							<div className="flex-shrink-0">
+								<h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+									GlobaLink
+								</h1>
+							</div>
 						</div>
 
 					{/* 메인 메뉴 */}

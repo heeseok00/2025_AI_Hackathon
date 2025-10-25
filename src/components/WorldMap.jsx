@@ -236,23 +236,23 @@ export default function WorldMap({ selectedCountry, onCountrySelect }) {
 	const centerXValue = useMotionValue(0);
 	const centerYValue = useMotionValue(20);
 	
-	// Spring 설정: 부드럽고 자연스러운 애니메이션
+	// Spring 설정: 빠르고 반응성 좋은 애니메이션
 	const zoom = useSpring(zoomValue, { 
-		stiffness: 50,  // 탄성 (낮을수록 부드러움)
-		damping: 20,     // 감쇠 (높을수록 빨리 멈춤)
-		mass: 1          // 질량 (무게감)
+		stiffness: 200,  // 탄성 (높을수록 빠름)
+		damping: 30,     // 감쇠 (높을수록 빨리 멈춤)
+		mass: 0.5        // 질량 (낮을수록 가벼움)
 	});
 	
 	const centerX = useSpring(centerXValue, { 
-		stiffness: 50,
-		damping: 20,
-		mass: 1
+		stiffness: 200,
+		damping: 30,
+		mass: 0.5
 	});
 	
 	const centerY = useSpring(centerYValue, { 
-		stiffness: 50,
-		damping: 20,
-		mass: 1
+		stiffness: 200,
+		damping: 30,
+		mass: 0.5
 	});
 
 	// Spring 값을 state로 변환 (ZoomableGroup에 전달하기 위함)
@@ -297,6 +297,43 @@ export default function WorldMap({ selectedCountry, onCountrySelect }) {
 		centerXValue.set(targetCenter[0]);
 		centerYValue.set(targetCenter[1]);
 	}, [selectedCountryData, zoomValue, centerXValue, centerYValue]);
+
+	// 줌 컨트롤 함수
+	const handleZoomIn = () => {
+		const newZoom = Math.min(position.zoom * 1.5, 8); // 최대 줌 레벨 8
+		zoomValue.set(newZoom);
+	};
+
+	const handleZoomOut = () => {
+		const newZoom = Math.max(position.zoom / 1.5, 0.25); // 최소 줌 레벨 0.25
+		zoomValue.set(newZoom);
+	};
+
+	const handleResetZoom = () => {
+		zoomValue.set(1);
+		centerXValue.set(0);
+		centerYValue.set(20);
+	};
+
+	// 고정 줌 레벨 설정
+	const handleSetZoom = (zoomLevel) => {
+		// 슬라이더는 즉시 반영 (spring 우회)
+		const numLevel = parseFloat(zoomLevel);
+		setPosition(prev => ({ ...prev, zoom: numLevel }));
+		zoomValue.set(numLevel);
+	};
+
+	// 사용자가 수동으로 줌/팬 했을 때 처리 (마우스 휠, 터치패드)
+	const handleMoveEnd = (newPosition) => {
+		// 사용자의 수동 조작을 즉시 반영
+		setPosition({
+			zoom: newPosition.zoom,
+			center: newPosition.coordinates
+		});
+		zoomValue.set(newPosition.zoom);
+		centerXValue.set(newPosition.coordinates[0]);
+		centerYValue.set(newPosition.coordinates[1]);
+	};
 
 	// 드롭다운 외부 클릭 감지
 	React.useEffect(() => {
@@ -491,6 +528,37 @@ export default function WorldMap({ selectedCountry, onCountrySelect }) {
 
 		{/* 지도 */}
 		<div ref={mapRef} className="relative bg-white rounded-lg shadow-inner p-2">
+			{/* 줌 컨트롤 버튼 */}
+			<div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
+				<button
+					onClick={handleZoomIn}
+					className="bg-white hover:bg-blue-50 text-gray-700 hover:text-blue-600 p-2 rounded-lg shadow-lg border border-gray-200 transition-all duration-200 hover:shadow-xl hover:scale-105 group"
+					title="줌 인 (확대)"
+				>
+					<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+					</svg>
+				</button>
+				<button
+					onClick={handleZoomOut}
+					className="bg-white hover:bg-blue-50 text-gray-700 hover:text-blue-600 p-2 rounded-lg shadow-lg border border-gray-200 transition-all duration-200 hover:shadow-xl hover:scale-105 group"
+					title="줌 아웃 (축소)"
+				>
+					<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M20 12H4" />
+					</svg>
+				</button>
+				<button
+					onClick={handleResetZoom}
+					className="bg-white hover:bg-blue-50 text-gray-700 hover:text-blue-600 p-2 rounded-lg shadow-lg border border-gray-200 transition-all duration-200 hover:shadow-xl hover:scale-105 group"
+					title="초기화"
+				>
+					<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+					</svg>
+				</button>
+			</div>
+
 			<ComposableMap
 				projection="geoMercator"
 				className="w-full h-auto"
@@ -500,9 +568,10 @@ export default function WorldMap({ selectedCountry, onCountrySelect }) {
 					<ZoomableGroup
 						zoom={position.zoom}
 						center={position.center}
+						onMoveEnd={handleMoveEnd}
 						translateExtent={[[-1000, -500], [1800, 900]]}
 						maxZoom={8}
-						minZoom={1}
+						minZoom={0.25}
 					>
 						<Geographies geography={geoUrl}>
 							{({ geographies }) =>
@@ -556,9 +625,109 @@ export default function WorldMap({ selectedCountry, onCountrySelect }) {
 				)}
 			</div>
 
+			{/* 줌 레벨 슬라이더 */}
+			<div className="mt-4 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 rounded-lg p-5 shadow-sm border border-blue-100">
+				<div className="flex items-center gap-4">
+					{/* 축소 아이콘 */}
+					<button
+						onClick={handleZoomOut}
+						className="flex-shrink-0 w-8 h-8 bg-white hover:bg-blue-100 text-gray-600 hover:text-blue-600 rounded-lg shadow-sm border border-gray-200 transition-all duration-200 flex items-center justify-center group"
+						title="줌 아웃"
+					>
+						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+						</svg>
+					</button>
+
+					{/* 슬라이더 컨테이너 */}
+					<div className="flex-1 relative">
+						{/* 배율 표시 라벨들 */}
+						<div className="flex justify-between mb-1 px-1">
+							<span className="text-xs text-gray-400 font-medium">1/4×</span>
+							<span className="text-xs text-gray-400 font-medium">1/2×</span>
+							<span className="text-xs text-indigo-500 font-bold">1×</span>
+							<span className="text-xs text-gray-400 font-medium">2×</span>
+							<span className="text-xs text-gray-400 font-medium">4×</span>
+						</div>
+
+						{/* 슬라이더 */}
+						<input
+							type="range"
+							min="0.25"
+							max="8"
+							step="0.01"
+							value={position.zoom}
+							onChange={(e) => {
+								const newZoom = parseFloat(e.target.value);
+								// 슬라이더는 즉시 반영 (딜레이 없음)
+								setPosition(prev => ({ ...prev, zoom: newZoom }));
+								zoomValue.set(newZoom);
+							}}
+							className="w-full h-3 bg-gradient-to-r from-blue-200 via-indigo-300 to-green-200 rounded-full appearance-none cursor-pointer slider-thumb"
+							style={{
+								background: `linear-gradient(to right, 
+									#93c5fd 0%, 
+									#93c5fd ${((Math.min(position.zoom, 1) - 0.25) / (1 - 0.25)) * 12.5}%, 
+									#a78bfa ${((Math.min(position.zoom, 1) - 0.25) / (1 - 0.25)) * 12.5}%, 
+									#a78bfa 12.5%, 
+									#86efac 12.5%, 
+									#86efac ${12.5 + ((Math.min(position.zoom, 8) - 1) / (8 - 1)) * 87.5}%, 
+									#ddd ${12.5 + ((Math.min(position.zoom, 8) - 1) / (8 - 1)) * 87.5}%, 
+									#ddd 100%)`
+							}}
+						/>
+
+						{/* 주요 지점 마커 */}
+						<div className="absolute top-8 left-0 right-0 flex justify-between px-1 pointer-events-none">
+							<div className="w-0.5 h-2 bg-blue-300 rounded"></div>
+							<div className="w-0.5 h-2 bg-gray-300 rounded"></div>
+							<div className="w-1 h-3 bg-indigo-400 rounded shadow-sm"></div>
+							<div className="w-0.5 h-2 bg-gray-300 rounded"></div>
+							<div className="w-0.5 h-2 bg-green-300 rounded"></div>
+						</div>
+					</div>
+
+					{/* 확대 아이콘 */}
+					<button
+						onClick={handleZoomIn}
+						className="flex-shrink-0 w-8 h-8 bg-white hover:bg-green-100 text-gray-600 hover:text-green-600 rounded-lg shadow-sm border border-gray-200 transition-all duration-200 flex items-center justify-center group"
+						title="줌 인"
+					>
+						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+						</svg>
+					</button>
+
+					{/* 리셋 버튼 */}
+					<button
+						onClick={handleResetZoom}
+						className="flex-shrink-0 w-8 h-8 bg-white hover:bg-indigo-100 text-gray-600 hover:text-indigo-600 rounded-lg shadow-sm border border-gray-200 transition-all duration-200 flex items-center justify-center group"
+						title="초기화 (1×)"
+					>
+						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+						</svg>
+					</button>
+				</div>
+
+				{/* 현재 줌 레벨 표시 */}
+				<div className="mt-3 text-center">
+					<span className="text-xs text-gray-500">
+						🔍 현재 줌: <span className="font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-green-600">{position.zoom.toFixed(2)}×</span>
+					</span>
+				</div>
+			</div>
+
 			{/* 안내 메시지 */}
-			<div className="mt-4 text-xs text-gray-500 text-center">
-				💡 총 {Object.keys(COUNTRIES).length}개 국가를 지원합니다. 드롭다운으로 검색하거나 지도를 클릭하세요.
+			<div className="mt-3 space-y-2">
+				<div className="text-xs text-gray-500 text-center">
+					💡 총 {Object.keys(COUNTRIES).length}개 국가를 지원합니다. 드롭다운으로 검색하거나 지도를 클릭하세요.
+				</div>
+				<div className="text-xs text-gray-400 text-center flex items-center justify-center gap-4">
+					<span>🖱️ 마우스 휠로 줌</span>
+					<span>👆 터치패드로 핀치 줌</span>
+					<span>🔘 버튼으로 제어</span>
+				</div>
 			</div>
 		</div>
 	);
