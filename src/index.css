@@ -107,3 +107,27 @@ code {
 .toss-card:hover {
   transform: translateY(-8px);
 }
+
+/* 지도 비행 효과 - 구글 어스 스타일 */
+.rsm-zoomable-group {
+  transition: transform 0.45s cubic-bezier(0.4, 0.0, 0.2, 1) !important;
+}
+
+/* 줌아웃 단계: ease-in (천천히 시작) */
+.zoom-out {
+  transition: transform 0.4s ease-in !important;
+}
+
+/* 이동 단계: linear (일정한 속도) */
+.zoom-travel {
+  transition: transform 1.2s cubic-bezier(0.42, 0, 0.58, 1) !important;
+}
+
+/* 줌인 단계: ease-out (천천히 끝) */
+.zoom-in {
+  transition: transform 0.4s ease-out !important;
+}
+
+.rsm-geography {
+  transition: fill 0.3s ease !important;
+}
