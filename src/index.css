@@ -82,20 +82,62 @@ code {
 
 /* 순차적 등장 애니메이션 (stagger) */
 .animate-toss-1 {
-  animation: tossSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  animation-delay: 0.1s;
+  animation: tossSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  animation-delay: 0.05s;
   animation-fill-mode: both;
 }
 
 .animate-toss-2 {
-  animation: tossSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  animation-delay: 0.2s;
+  animation: tossSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  animation-delay: 0.1s;
   animation-fill-mode: both;
 }
 
 .animate-toss-3 {
-  animation: tossSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: tossSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  animation-delay: 0.15s;
+  animation-fill-mode: both;
+}
+
+.animate-toss-4 {
+  animation: tossSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  animation-delay: 0.2s;
+  animation-fill-mode: both;
+}
+
+.animate-toss-5 {
+  animation: tossSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  animation-delay: 0.25s;
+  animation-fill-mode: both;
+}
+
+.animate-toss-6 {
+  animation: tossSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   animation-delay: 0.3s;
+  animation-fill-mode: both;
+}
+
+.animate-toss-7 {
+  animation: tossSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  animation-delay: 0.35s;
+  animation-fill-mode: both;
+}
+
+.animate-toss-8 {
+  animation: tossSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  animation-delay: 0.4s;
+  animation-fill-mode: both;
+}
+
+.animate-toss-9 {
+  animation: tossSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  animation-delay: 0.45s;
+  animation-fill-mode: both;
+}
+
+.animate-toss-10 {
+  animation: tossSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  animation-delay: 0.5s;
   animation-fill-mode: both;
 }
 
