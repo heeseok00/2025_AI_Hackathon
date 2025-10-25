@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Navigation from '../components/Navigation.jsx';
 import WorldMap from '../components/WorldMap.jsx';
+import CountryWindow from '../components/CountryWindow.jsx';
 import NewsCard from '../components/NewsCard.jsx';
 import { fetchNews } from '../api/newsAPI.js';
 
@@ -9,6 +10,8 @@ export default function Home() {
 	const [articles, setArticles] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const newsRef = useRef(null);
+	const hasMountedRef = useRef(false);
+	const [isCountryWindowOpen, setIsCountryWindowOpen] = useState(false);
 
 	useEffect(() => {
 		(async () => {
@@ -20,11 +23,19 @@ export default function Home() {
 			// 국가 선택 시 뉴스 섹션으로 부드럽게 스크롤
 			if (newsRef.current) {
 				setTimeout(() => {
-					newsRef.current.scrollIntoView({ 
-						behavior: 'smooth', 
-						block: 'start' 
+					newsRef.current.scrollIntoView({
+						behavior: 'smooth',
+						block: 'center',
+						inline: 'nearest'
 					});
-				}, 100);
+				}, 120);
+			}
+
+			// 초기 렌더링 이후 국가 변경 시 빈 직사각형 페이지 표시
+			if (hasMountedRef.current) {
+				setIsCountryWindowOpen(true);
+			} else {
+				hasMountedRef.current = true;
 			}
 		})();
 	}, [country]);
@@ -73,25 +84,8 @@ export default function Home() {
 						)}
 					</div>
 
-					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-						{articles.length === 0 && !loading ? (
-							<div className="col-span-full text-center py-12">
-								<div className="text-6xl mb-4">📭</div>
-								<p className="text-gray-600 text-lg">아직 뉴스가 없습니다.</p>
-								<p className="text-gray-500 text-sm mt-2">API를 연동하면 뉴스가 표시됩니다.</p>
-							</div>
-						) : (
-							articles.map((article, idx) => (
-								<NewsCard
-									key={idx}
-									title={article.title}
-									description={article.description}
-									source={article.source}
-									url={article.url}
-								/>
-							))
-						)}
-					</div>
+				{/* 빈 직사각형 페이지 */}
+				<CountryWindow open={isCountryWindowOpen} countryCode={country} />
 				</section>
 			</main>
 
