@@ -71,30 +71,36 @@ export default function Navigation() {
 							</h1>
 						</div>
 
-						{/* 메인 메뉴 */}
-						<div className="hidden md:flex md:space-x-1">
-							{NAV_ITEMS.map((item) => (
-								<div
-									key={item.id}
-									className="relative"
-									onMouseEnter={() => setOpenDropdown(item.id)}
+					{/* 메인 메뉴 */}
+					<div className="hidden md:flex md:flex-1 md:items-center md:justify-between md:max-w-3xl md:mx-auto">
+						{NAV_ITEMS.map((item, index) => (
+							<div
+								key={item.id}
+								className="relative flex-1"
+								onMouseEnter={() => setOpenDropdown(item.id)}
+								style={{ 
+									minWidth: '160px',
+									maxWidth: '220px',
+									marginLeft: index === 0 ? '0' : '4px',
+									marginRight: index === NAV_ITEMS.length - 1 ? '0' : '4px'
+								}}
+							>
+								<button
+									className={`w-full px-6 py-5 text-base font-semibold transition-colors relative ${
+										openDropdown === item.id
+											? 'text-blue-600'
+											: 'text-gray-700 hover:text-blue-600'
+									}`}
 								>
-									<button
-										className={`px-6 py-5 text-base font-semibold transition-colors relative ${
-											openDropdown === item.id
-												? 'text-blue-600'
-												: 'text-gray-700 hover:text-blue-600'
-										}`}
-									>
-										{item.title}
-										{/* 하단 파란색 바 */}
-										{openDropdown === item.id && (
-											<div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600"></div>
-										)}
-									</button>
-								</div>
-							))}
-						</div>
+									{item.title}
+									{/* 하단 파란색 바 */}
+									{openDropdown === item.id && (
+										<div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600"></div>
+									)}
+								</button>
+							</div>
+						))}
+					</div>
 
 						{/* 우측 버튼 */}
 						<div className="flex items-center space-x-2">
@@ -117,40 +123,65 @@ export default function Navigation() {
 					</div>
 				</div>
 
-				{/* 통합 드롭다운 영역 - 각 메뉴 아래에 일렬로 배치 */}
+				{/* 통합 드롭다운 영역 - 각 메뉴 아래에 정확히 수직 정렬 */}
 				{openDropdown && (
 					<div className="absolute left-0 right-0 top-full bg-white border-t border-gray-200 shadow-2xl animate-slideDown z-40">
 						<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-							<div className="flex justify-center gap-1 py-6">
-								{/* 각 메뉴를 상단 버튼과 같은 위치에 배치 */}
-								{NAV_ITEMS.map((menuItem) => (
-									<div key={menuItem.id} className="px-6" style={{ minWidth: '200px' }}>
-										<div className="space-y-2">
-											<h3 className={`text-sm font-bold pb-2 mb-2 border-b-2 transition-all duration-300 ${
-												openDropdown === menuItem.id 
-													? 'text-blue-600 border-blue-600' 
-													: 'text-gray-400 border-transparent'
-											}`}>
-												{menuItem.title}
-											</h3>
-											<div className="space-y-1">
-												{menuItem.subItems.map((subItem) => (
-													<a
-														key={subItem.id}
-														href={subItem.link}
-														className={`block px-3 py-2.5 text-sm rounded-md transition-all duration-200 ${
-															openDropdown === menuItem.id
-																? 'text-gray-700 hover:bg-blue-50 hover:text-blue-600 hover:translate-x-1'
-																: 'text-gray-300 pointer-events-none'
-														}`}
-													>
-														{subItem.title}
-													</a>
-												))}
+							{/* 상단 레이아웃과 정확히 동일한 flex 구조 */}
+							<div className="flex items-start justify-between">
+								{/* 로고 영역과 동일한 flex-shrink-0 (자동으로 로고 너비만큼) */}
+								<div className="flex-shrink-0">
+									<div className="text-2xl font-bold invisible">GlobaLink</div>
+								</div>
+								
+								{/* 메뉴 영역 - 상단과 정확히 동일한 레이아웃 */}
+								<div className="flex-1 flex items-start justify-between divide-x divide-gray-200 max-w-3xl mx-auto">
+									{NAV_ITEMS.map((menuItem, index) => (
+										<div 
+											key={menuItem.id} 
+											className="flex-1 py-6"
+											style={{ 
+												minWidth: '160px',
+												maxWidth: '220px',
+												marginLeft: index === 0 ? '0' : '4px',
+												marginRight: index === NAV_ITEMS.length - 1 ? '0' : '4px',
+												paddingLeft: '24px',
+												paddingRight: '24px'
+											}}
+										>
+											<div className="space-y-2">
+												<h3 className={`text-sm font-bold pb-2 mb-2 border-b-2 transition-all duration-300 ${
+													openDropdown === menuItem.id 
+														? 'text-blue-600 border-blue-600' 
+														: 'text-gray-400 border-transparent'
+												}`}>
+													{menuItem.title}
+												</h3>
+												<div className="space-y-1">
+													{menuItem.subItems.map((subItem) => (
+														<a
+															key={subItem.id}
+															href={subItem.link}
+															className={`block px-3 py-2.5 text-sm rounded-md transition-all duration-200 ${
+																openDropdown === menuItem.id
+																	? 'text-gray-700 hover:bg-blue-50 hover:text-blue-600 hover:translate-x-1'
+																	: 'text-gray-300 pointer-events-none'
+															}`}
+														>
+															{subItem.title}
+														</a>
+													))}
+												</div>
 											</div>
 										</div>
-									</div>
-								))}
+									))}
+								</div>
+								
+								{/* 우측 버튼 영역과 동일한 flex 공간 */}
+								<div className="flex items-center space-x-2 invisible">
+									<button className="px-4 py-2 text-sm font-medium">로그인</button>
+									<button className="px-4 py-2 text-sm font-medium">회원가입</button>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -160,7 +191,7 @@ export default function Navigation() {
 			{/* 어두운 배경 오버레이 */}
 			{openDropdown && (
 				<div 
-					className="fixed inset-0 bg-black/20 animate-overlay z-30"
+					className="fixed inset-0 bg-black/50 animate-overlay z-30"
 					style={{ top: '64px' }}
 					onMouseEnter={() => setOpenDropdown(null)}
 				/>
