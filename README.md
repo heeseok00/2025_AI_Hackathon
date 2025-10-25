@@ -4,6 +4,50 @@
 
 ---
 
+## 🚀 빠른 시작 (Quick Start)
+
+### 1️⃣ 프로젝트 클론
+```bash
+git clone https://github.com/heeseok00/2025_AI_Hackathon.git
+cd 2025_AI_Hackathon
+```
+
+### 2️⃣ 의존성 설치
+```bash
+npm install
+```
+
+### 3️⃣ 개발 서버 실행
+```bash
+npm run dev
+```
+
+브라우저에서 **http://localhost:5173** 접속하면 앱이 실행됩니다! 🎉
+
+### 4️⃣ (선택) 환경 변수 설정
+API 연동을 위해서는 `.env` 파일 생성이 필요합니다:
+
+```bash
+# .env 파일 생성
+cp .env.example .env
+
+# 에디터로 .env 파일을 열어 API 키 입력
+# VITE_NEWS_API_KEY=your_api_key_here
+# VITE_OPENAI_API_KEY=your_api_key_here
+```
+
+자세한 API 키 발급 방법은 [`ENV_SETUP.md`](ENV_SETUP.md) 참고
+
+---
+
+## 📋 필수 요구사항
+
+- **Node.js**: v16 이상
+- **npm**: v7 이상
+- **브라우저**: Chrome, Firefox, Safari 최신버전
+
+---
+
 ## 📁 프로젝트 구조
 
 ```

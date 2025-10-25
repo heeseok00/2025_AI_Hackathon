@@ -6,7 +6,7 @@ import NewsCard from '../components/NewsCard.jsx';
 import { fetchNews } from '../api/newsAPI.js';
 
 export default function Home() {
-	const [country, setCountry] = useState('US');
+	const [country, setCountry] = useState(null);
 	const [articles, setArticles] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const newsRef = useRef(null);
@@ -14,6 +14,8 @@ export default function Home() {
 	const [isCountryWindowOpen, setIsCountryWindowOpen] = useState(false);
 
 	useEffect(() => {
+		if (!country) return;
+
 		(async () => {
 			setLoading(true);
 			const results = await fetchNews({ countryCode: country });
@@ -52,10 +54,27 @@ export default function Home() {
 						<div>
 							<p className="text-sm text-gray-600">글로벌 뉴스 플랫폼</p>
 						</div>
-						<div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full">
-							<span className="text-sm font-medium text-gray-700">선택된 국가:</span>
-							<span className="text-lg font-bold text-blue-600">{country}</span>
+					{country ? (
+						<div className="flex items-center gap-3">
+							<div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full border border-blue-200">
+								<span className="text-sm font-medium text-gray-700">선택된 국가:</span>
+								<span className="text-lg font-bold text-blue-600">{country}</span>
+							</div>
+							<button
+								onClick={() => setCountry(null)}
+								className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all duration-200"
+								title="초기화"
+							>
+								<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+								</svg>
+							</button>
 						</div>
+					) : (
+						<div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-full">
+							<span className="text-sm font-medium text-gray-500">국가를 선택해주세요</span>
+						</div>
+					)}
 					</div>
 				</div>
 			</header>
@@ -67,11 +86,11 @@ export default function Home() {
 					<WorldMap selectedCountry={country} onCountrySelect={setCountry} />
 				</section>
 
-				{/* 뉴스 섹션 - ref 추가 */}
-				<section ref={newsRef} className="scroll-mt-20">
+				{/* 뉴스 섹션 */}
+				<section className="scroll-mt-20" ref={newsRef}>
 					<div className="flex items-center justify-between mb-6">
 						<h2 className="text-2xl font-bold text-gray-800">
-							📰 {country} 주요 뉴스
+							📰 {country ? `${country} 주요 뉴스` : '글로벌 뉴스'}
 						</h2>
 						{loading && (
 							<div className="flex items-center gap-2 text-blue-600">
@@ -84,8 +103,35 @@ export default function Home() {
 						)}
 					</div>
 
-				{/* 빈 직사각형 페이지 */}
-				<CountryWindow open={isCountryWindowOpen} countryCode={country} />
+					{/* CountryWindow 컴포넌트 */}
+					<CountryWindow open={isCountryWindowOpen} countryCode={country} topArticles={articles} />
+
+					{/* 기존 뉴스 카드 그리드 */}
+					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+						{!country ? (
+							<div className="col-span-full text-center py-12">
+								<div className="text-6xl mb-4">🗺️</div>
+								<p className="text-gray-600 text-lg font-semibold">국가를 선택해주세요</p>
+								<p className="text-gray-500 text-sm mt-2">지도에서 국가를 클릭하거나 드롭다운에서 검색하세요.</p>
+							</div>
+						) : articles.length === 0 && !loading ? (
+							<div className="col-span-full text-center py-12">
+								<div className="text-6xl mb-4">📭</div>
+								<p className="text-gray-600 text-lg">아직 뉴스가 없습니다.</p>
+								<p className="text-gray-500 text-sm mt-2">API를 연동하면 뉴스가 표시됩니다.</p>
+							</div>
+						) : (
+							articles.map((article, idx) => (
+								<NewsCard
+									key={idx}
+									title={article.title}
+									description={article.description}
+									source={article.source}
+									url={article.url}
+								/>
+							))
+						)}
+					</div>
 				</section>
 			</main>
 
